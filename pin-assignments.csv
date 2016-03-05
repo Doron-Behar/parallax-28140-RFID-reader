@@ -1,0 +1,4 @@
+to,location
+reset,PIN_M23
+clk50mhz,PIN_Y2
+RFID_not_data,PIN_AC19
