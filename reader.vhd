@@ -9,12 +9,19 @@ entity RFID_reader is
 		clk50mhz		:in std_logic;
 		RFID_not_data	:in std_logic;
 		ID				:out std_logic_vector(40-1 downto 0);
-		successful		:out std_logic;
-		read_state		:out std_logic
+		successful		:out std_logic
 	);
 end entity;
 
 architecture arc of RFID_reader is
+function ascii2hex(code:std_logic_vector(6 downto 0)) return std_logic_vector is
+begin
+	if code<x"3a" and code>=x"2F" then
+		return code-x"30";
+	elsif code<x"47" and code>x"40" then
+		return code-x"41";
+	end if;
+end function;
 component PLL50mhz_2400hz
 	port	(	areset	:in std_logic:='0';
 				inclk0	:in std_logic:='0';
@@ -32,20 +39,14 @@ begin
 		);
 	process(clk2400hz,reset,data)
 	variable tmp:std_logic_vector(7 downto 0);
-	variable counter:integer;
-	type main_state_type is (wait4startbits,startbits,wait4reading,reading,wait4endbits,endbits);
+	variable counter:integer range 0 to 7;
+	type main_state_type is (wait4startbits,startbits,wait4char,reading,wait4endbits,endbits);
 	variable main_state:main_state_type;
-	type read_state_type is (wait4startbit,reading);
-	type read_type is record
-		byte:integer range 0 to 9;
-		state:read_state_type;
-	end record;
-	variable read:read_type;
+	variable byte:integer range 0 to 9;
 	begin
 		if reset='0' then
 			main_state:=wait4startbits;
-			read.state:=wait4startbit;
-			read.byte:=0;
+			byte:=0;
 			counter:=0;
 			tmp:=(others=>'0');
 			ID<=(others=>'0');
@@ -64,58 +65,36 @@ begin
 				else
 					counter:=0;
 					if tmp=x"0a" and data='1' then--data='1' is stop-bit
-						main_state:=wait4reading;
+						main_state:=wait4char;
 					else
 						main_state:=wait4startbits;
 					end if;
 				end if;
-			when wait4reading=>
+			when wait4char=>
 				if data='0' then
 					main_state:=reading;
 				else
 					main_state:=wait4startbits;
 				end if;
 			when reading=>
-				case read.byte is
-				when 0 to 8=>
-					case read.state is
-					when wait4startbit=>
-						if data='0' then--data='0' is start-bit
-							read.state:=reading;
-						end if;
-					when reading=>
-						if counter<8 then
-							tmp(counter):=data;
-							counter:=counter+1;
+				if counter<8 then
+					tmp(counter):=data;
+					counter:=counter+1;
+				else
+					counter:=0;
+					if data='1' then--data='1'
+						ID(byte*4+3 downto byte*4)<=ascii2hex(tmp);
+						if byte<9 then
+							main_state:=wait4char;
+							byte:=byte+1;
 						else
-							counter:=0;
-							if data='1' then--data='1' is stop-bit
-								ID(read.byte*8+7 downto read.byte*8)<=tmp;
-								read.byte:=read.byte+1;
-								read.state:=wait4startbit;
-							end if;
+							main_state:=wait4endbits;
+							byte:=0;
 						end if;
-					end case;
-				when 9=>
-					case read.state is
-					when wait4startbit=>
-						if data='0' then--data='0' is start-bit
-							read.state:=reading;
-						end if;
-					when reading=>
-						if counter<8 then
-							tmp(counter):=data;
-							counter:=counter+1;
-						else
-							counter:=0;
-							if data='1' then--data='1' is stop-bit
-								ID(read.byte*8+7 downto read.byte*8)<=tmp;
-								read.byte:=0;
-								main_state:=wait4endbits;
-							end if;
-						end if;
-					end case;
-				end case;
+					else
+						main_state:=wait4startbits;
+					end if;
+				end if;
 			when wait4endbits=>
 				if data='0' then
 					main_state:=endbits;
@@ -136,11 +115,6 @@ begin
 					main_state:=wait4startbits;
 				end if;
 			end case;
-		end if;
-		if read.state=wait4startbit then
-			read_state<='1';
-		else 
-			read_state<='0';
 		end if;
 	end process;
 end arc;
