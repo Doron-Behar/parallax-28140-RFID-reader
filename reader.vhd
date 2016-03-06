@@ -15,6 +15,18 @@ entity RFID_reader is
 end entity;
 
 architecture arc of RFID_reader is
+function ascii2hex(code:std_logic_vector(7 downto 0)) return std_logic_vector is
+	variable var:std_logic_vector(7 downto 0);
+begin
+	if code<x"3a" and code>=x"30" then
+		var:=code-x"30";
+	elsif code<x"47" and code>x"40" then
+		var:=code-x"41";
+	else
+		var:=x"00";
+	end if;
+	return var(3 downto 0);
+end function;
 component PLL50mhz_2400hz
 	port	(	areset	:in std_logic:='0';
 				inclk0	:in std_logic:='0';
@@ -90,7 +102,7 @@ begin
 						else
 							counter:=0;
 							if data='1' then--data='1' is stop-bit
-								ID(read.byte*8+7 downto read.byte*8)<=tmp;
+								ID(read.byte*4+3 downto read.byte*4)<=ascii2hex(tmp);
 								read.byte:=read.byte+1;
 								read.state:=wait4startbit;
 							end if;
@@ -109,7 +121,7 @@ begin
 						else
 							counter:=0;
 							if data='1' then--data='1' is stop-bit
-								ID(read.byte*8+7 downto read.byte*8)<=tmp;
+								ID(read.byte*4+3 downto read.byte*4)<=ascii2hex(tmp);
 								read.byte:=0;
 								main_state:=wait4endbits;
 							end if;
