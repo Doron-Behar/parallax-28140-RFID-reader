@@ -53,6 +53,7 @@ begin
 				if data='0' then--start-bit
 					main_state:=startbits;
 					successful<='0';
+					ID<=(others=>'Z');
 				end if;
 			when startbits=>
 				if counter<8 then
@@ -111,6 +112,7 @@ begin
 						end loop;
 					else
 						successful<='0';
+						ID<=(others=>'Z');
 					end if;
 					main_state:=wait4startbits;
 				end if;
