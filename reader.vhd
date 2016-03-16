@@ -30,17 +30,47 @@ begin
 			c0=>clk2400hz
 		);
 	process(clk2400hz,reset,data)
-	variable tmp:std_logic_vector(7 downto 0);
-	variable counter:integer range 0 to 100;
-	type main_state_type is (wait4startbits,startbits,wait4reading,reading,wait4endbits,endbits);
-	variable main_state:main_state_type;
-	variable var:std_logic_vector(100-1 downto 0);
-	type IDR_type is array(3 downto 0) of std_logic_vector(100-1 downto 0);
-	variable IDR:IDR_type;
-	type byte_type is array(3 downto 0) of std_logic_vector(7 downto 0);
-	variable byte:byte_type;
-	variable ascii:std_logic_vector(7 downto 0);
-	variable sample:integer range 0 to 3;
+	function valid(chr:std_logic_vector(9 downto 0)) return boolean is
+	begin
+		if chr(9)='1' and ((chr(8 downto 1)>=x"30" and chr(8 downto 1)<=x"39") or (chr(8 downto 1)>=x"41" and chr(8 downto 1)<=x"46")) and chr(0)='0' then
+			return true;
+		else
+			return false;
+		end if;
+	end function;
+	function ascii2hex(chr:std_logic_vector(7 downto 0)) return std_logic_vector is
+		variable x:std_logic_vector(7 downto 0);
+	begin
+		if chr>=x"30" and chr<=x"39" then
+			x:=chr-x"30";
+		elsif chr>=x"41" and chr<=x"46" then
+			x:=chr-x"41"+10;
+		else
+			x:=(others=>'Z');
+		end if;
+		return x(3 downto 0);
+	end function;
+		variable tmp:std_logic_vector(7 downto 0);
+		variable counter:integer range 0 to 100;
+		type main_state_type is (wait4startbits,startbits,wait4byte,reading,wait4endbits,endbits,fixing);
+		variable main_state:main_state_type;
+		variable sample:integer range 0 to 3;
+		variable index:integer range 0 to 9;
+		variable err:main_state_type;
+	procedure assign(
+		byte:in std_logic_vector(7 downto 0)
+	) is
+	begin
+		ID(index*4+3 downto index*4)<=ascii2hex(byte);
+		successful<='1';
+		if index<10 then
+			index:=index+1;
+			main_state:=wait4byte;
+		else
+			index:=0;
+			main_state:=wait4endbits;
+		end if;
+	end procedure assign;
 	begin
 		if reset='0' then
 			main_state:=wait4startbits;
@@ -48,97 +78,91 @@ begin
 			tmp:=(others=>'0');
 			ID<=(others=>'0');
 			successful<='0';
-			var:=(others=>'0');
-			IDR:=(others=>(others=>'0'));
-			sample:=0;
-			byte:=(others=>"00000000");
-			ascii:=(others=>'0');
+			index:=0;
 		elsif rising_edge(clk2400hz) then
-		case main_state is
-			when wait4startbits=>
-				if data='0' then--start-bit
-					main_state:=startbits;
-					successful<='0';
-				end if;
-			when startbits=>
-				if counter<8 then
-					tmp(counter):=data;
-					counter:=counter+1;
-				else
-					counter:=0;
-					if tmp=x"0a" and data='1' then--data='1' is stop-bit
-						main_state:=wait4reading;
-					else
-						main_state:=wait4startbits;
+			case main_state is
+				when wait4startbits=>
+					if data='0' then--start-bit
+						main_state:=startbits;
+						successful<='0';
+						tmp:=(others=>'0');
+						index:=0;
 					end if;
-				end if;
-			when wait4reading=>
-				if data='0' then
-					main_state:=reading;
-				else
-					main_state:=wait4startbits;
-				end if;
-			when reading=>
-				if counter<100-1 then
-					counter:=counter+1;
-					var(counter):=data;
-				else
-					counter:=0;
-					if data='1' then
-						main_state:=wait4endbits;
+				when startbits=>
+					if counter<8 then
+						tmp(counter):=data;
+						counter:=counter+1;
 					else
-						main_state:=wait4startbits;
-					end if;
-				end if;
-			when wait4endbits=>
-				if data='0' then
-					main_state:=endbits;
-				else
-					main_state:=wait4startbits;
-				end if;
-			when endbits=>
-			if counter<8 then
-				tmp(counter):=data;
-				counter:=counter+1;
-			else
-				counter:=0;
-				if tmp=x"0d" and data='1' then--data='1' is stop-bit
-					successful<='1';
-					IDR(sample):=var;
-					for i in 0 to 9 loop
-						byte(sample):=IDR(sample)(i*10+8 downto i*10+1);
-						if IDR(sample)(i*10)='0' and IDR(sample)(i*10+9)='1' then
-							if byte(0)=byte(1) or byte(0)=byte(2) or byte(0)=byte(3) then
-								if byte(0)>=x"30" and byte(0)<=x"39" then
-									ascii:=byte(0)-x"30";
-									ID(i*4+3 downto i*4)<=ascii(3 downto 0);
-								else
-									ID(i*4+3 downto i*4)<="ZZZZ";
-								end if;
-							elsif byte(1)=byte(2) or byte(1)=byte(3) then
-								if byte(1)>=x"30" and byte(1)<=x"39" then
-									ascii:=byte(1)-x"30";
-									ID(i*4+3 downto i*4)<=ascii(3 downto 0);
-								else
-									ID(i*4+3 downto i*4)<="ZZZZ";
-								end if;
-							elsif byte(2)=byte(3) then
-								if byte(2)>=x"30" and byte(2)<=x"39" then
-									ascii:=byte(2)-x"30";
-									ID(i*4+3 downto i*4)<=ascii(3 downto 0);
-								else
-									ID(i*4+3 downto i*4)<="ZZZZ";
-								end if;
-							end if;
+						counter:=0;
+						if tmp=x"0a" and data='1' then--data='1' is stop-bit
+							main_state:=wait4byte;
+						else
+							main_state:=wait4startbits;
+							err:=startbits;
 						end if;
-					end loop;
-					sample:=sample+1;
-				else
+					end if;
+				when wait4byte=>
 					successful<='0';
-				end if;
-				main_state:=wait4startbits;
-			end if;
-		end case;
+					if data='0' then
+						main_state:=reading;
+					else
+						err:=wait4byte;
+						main_state:=fixing;
+					end if;
+				when reading=>
+					if counter<8 then
+						tmp(counter):=data;
+						counter:=counter+1;
+					else
+						counter:=0;
+						if valid(data&tmp&'0')=true then
+							assign(tmp);
+						else
+							err:=reading;
+							main_state:=fixing;
+						end if;
+					end if;
+				when wait4endbits=>
+					if data='0' then
+						main_state:=endbits;
+					else
+						err:=wait4endbits;
+						main_state:=wait4startbits;
+					end if;
+				when endbits=>
+					if counter<8 then
+						tmp(counter):=data;
+						counter:=counter+1;
+					else
+						counter:=0;
+						if tmp=x"0D" and data='1' then
+							successful<='1';
+						else
+							err:=endbits;
+						end if;
+						main_state:=wait4startbits;
+					end if;
+				when fixing=>
+					if err=reading then
+						--check if the byte that was recieved is in a proper range:
+						if valid(data&tmp&'0')=true then
+							--mistake is in the stop-bit
+							--A.O.K --an extra '0' bit was added right before the end-bit
+							assign(tmp);
+						else
+							main_state:=wait4startbits;
+						end if;
+					elsif err=wait4byte then
+						--mirror to `wait4byte` state
+						successful<='0';
+						if data='0' then
+							main_state:=reading;
+						else
+							err:=wait4byte;
+							main_state:=wait4startbits;
+						end if;
+					end if;
+			end case;
 		end if;
 	end process;
 end arc;
