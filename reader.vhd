@@ -62,8 +62,7 @@ begin
 	) is
 	begin
 		ID(index*4+3 downto index*4)<=ascii2hex(byte);
-		successful<='1';
-		if index<10 then
+		if index<9 then
 			index:=index+1;
 			main_state:=wait4byte;
 		else
@@ -154,7 +153,6 @@ begin
 						end if;
 					elsif err=wait4byte then
 						--mirror to `wait4byte` state
-						successful<='0';
 						if data='0' then
 							main_state:=reading;
 						else
