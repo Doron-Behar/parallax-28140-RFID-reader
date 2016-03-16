@@ -8,6 +8,8 @@ DEV=EP4CE115F29C7
 F="Cyclone IV E"
 # path to all binaries of quartus:
 QUARTUS_BIN_PATH=/opt/altera.15.1/quartus/bin
+# frequency for pll:
+f=2400
 all: compile program
 compile:
 	${QUARTUS_BIN_PATH}/quartus_sh --flow compile ${P}
@@ -19,3 +21,5 @@ RTL:
 	${QUARTUS_BIN_PATH}/qnui ${P}
 symbol:
 	${QUARTUS_BIN_PATH}/quartus_map ${P} --generate_symbol=${d}
+analysis:
+	${QUARTUS_BIN_PATH}/quartus_map ${P}
