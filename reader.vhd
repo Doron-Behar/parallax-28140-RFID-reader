@@ -5,11 +5,11 @@ use IEEE.std_logic_arith.all;
 
 entity RFID_reader is
 	port	(
-		reset			:in std_logic;
-		clk50mhz		:in std_logic;
-		RFID_not_data	:in std_logic;
-		ID				:out std_logic_vector(40-1 downto 0);
-		successful		:out std_logic
+		reset		:in std_logic;
+		clk50mhz	:in std_logic;
+		not_data	:in std_logic;
+		ID			:out std_logic_vector(40-1 downto 0);
+		successful	:out std_logic
 	);
 end entity;
 
@@ -22,7 +22,7 @@ end component;
 signal data		:std_logic;
 signal clk2400hz:std_logic;
 begin
-	data<=not RFID_not_data;
+	data<=not not_data;
 	PLL50mhz_2400hz_inst:PLL50mhz_2400hz
 		port map(
 			inclk0=>clk50mhz,
