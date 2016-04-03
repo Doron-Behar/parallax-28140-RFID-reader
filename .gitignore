@@ -1,0 +1,15 @@
+RFID-reader*
+*.qip
+*.ppf
+*.swo
+.qsys*
+*.bsf
+output_files/
+*.qpf
+greybox_tmp/
+*.qsf
+*.qws
+*db/
+*.txt
+simulation/
+
