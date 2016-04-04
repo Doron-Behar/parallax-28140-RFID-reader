@@ -8,8 +8,8 @@ The reader is connected to the GPIO expansion of the Device. The device for whic
 
 The **User-manual**/**datasheet** for the reader was found [here][1] and can be viewed [here][manual-git-blob] within the repo, downloaded [here] [manual-git-blob].
 
-The reader transmits data in a frequency of `125[khz]` through $S_{out}$ as described in the manual and can be observed [here:][reader.png]
-![reader](https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/images/reader.png)
+The reader transmits data in a frequency of `125[khz]` through the RFID card and transmits through $S_{out}$ the data. As described in the manual is shown here:
+![reader](https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/images/reader.png)
 
 ###Voltage Compatibility with the FPGA
 You can use the GPIO expansion to provide voltage source to the driver and as GND:
@@ -22,9 +22,8 @@ Quote from the manual for `DE2-115`:
 > The voltage level of the I/O pins on the expansion headers can be adjusted to 3.3V, 2.5V, 1.8V, or
 1.5V using JP6 (The default value is 3.3V[..])
 
-I designed and implemented the following design:[^123d-circuits]
-![circuit](https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/images/circuit.png)
-[^123d-circuits]: I had help from [123d.circuits.com](123d.circuits.com) to illustrate it.
+I designed and implemented the following design:<sup>1</sup>
+![circuit](https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/images/circuit.png)
 ####This is how the circuit work for every state of $S_{out}$:
 |$S_{out}=5[V]$                     |$S_{out}=0[V]$
 |-----------------------------------|------------------
@@ -53,21 +52,24 @@ a valid ID of 0F0184F07A, the following bytes would be sent: 0x0A,
 The reader is broadcasting at $2400[\frac{bits}{sec}]$, therefor it's maximum frequency is $1200[hz]$ because you need $2$ bits to make $1$ cycle. According to $Nyquist$, The sampling rate should be twice as much therefor it's $2400[hz]$. This is the sampling rate I chose with (created by a pll by Altera).
 ####Errors at Transporting
 According to the communication protocol, There are $10$ bits send per byte. There are $2$ bytes for the end and start and $10$ bytes for the ID itself. Summing up all together leads to $12*10=120$ bits at total in one broadcast. 
-*The sad truth* is that In real life there are Errors just like in any other communication protocol and The driver must be able to fix it. The errors that I got and I saw using `signaltap`[^stp] were extra bits sent randomly during the broadcast, usually $2$. I have sort of managed to fix it with the software, but I'll be more than glad to have pull-requests for [that section][reader.vhd|fixing].
+*The sad truth* is that In real life there are Errors just like in any other communication protocol and The driver must be able to fix it. The errors that I got and I saw using `signaltap`<sup>2</sup> were extra bits sent randomly during the broadcast, usually $2$. I have sort of managed to fix it with the software, but I'll be more than glad to have pull-requests for [that section][reader.vhd|fixing].
 
-I have here a very colorized sampling example of a few samples taken.[^samples-html]
-![samples](https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/images/samples.png)
-[^samples-html]: You can Access the data via [the HTML version][samples.html]. 
+I have here a very colorized sampling example of a few samples taken.<sup>3</sup>
+![samples](https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/images/samples.png)
 
 As you can see, Where I've putten red `z`, it's an error. Besides that, the start bit and end bit are `'0'` and `'1'` in conjunction.
-[^stp]: The `signaltap` feature in `Quartus` enables you to see the actual bits that are sent through the device. It's was extremely usefull for me in this development.
 ####Fixing the Errors
 Check out the [`reader.vhd`][reader.vhd|case] and the `case` named [`fixing`][reader.vhd|fixing] at line 145.
+
+-----------
+1. I had help from [123d.circuits.com](123d.circuits.com) to illustrate it.
+2. The `signaltap` feature in `Quartus` enables you to see the actual bits that are sent through the device. It's was extremely usefull for me in this development.
+3. You can Access the data via [the HTML version][samples.html]
 [1]: https://www.parallax.com/product/28140
 [2]: https://github.com/Doron-Behar/parallax-28140-RFID-reader/blob/master/pin-assignments.csv
 [manual-git-blob]: https://github.com/Doron-Behar/parallax-28140-RFID-reader/blob/master/manual.pdf
-[manual-git-raw]: https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/manual.pdf
-[reader.png]: https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/images/reader.png
-[samples.html]: https://raw.githubusercontent.com/parallax-28140-RFID-reader/master/samples.html
+[manual-git-raw]: https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/manual.pdf
+[reader.png]: https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/images/reader.png
+[samples.html]: https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/samples.html
 [reader.vhd|case]: https://github.com/Doron-Behar/parallax-28140-RFID-reader/blob/master/reader.vhd#L82
 [reader.vhd|fixing]: https://github.com/Doron-Behar/parallax-28140-RFID-reader/blob/master/reader.vhd#L145
