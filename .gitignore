@@ -12,4 +12,5 @@ greybox_tmp/
 *db/
 *.txt
 simulation/
+*.stp
 
