@@ -9,7 +9,8 @@ entity RFID_reader is
 		clk50mhz	:in std_logic;
 		not_data	:in std_logic;
 		ID			:out std_logic_vector(40-1 downto 0);
-		successful	:out std_logic
+		successful	:out std_logic;
+		broadcast	:out std_logic
 	);
 end entity;
 
@@ -78,6 +79,7 @@ begin
 			ID<=(others=>'0');
 			successful<='0';
 			index:=0;
+			broadcast<='0';
 		elsif rising_edge(clk2400hz) then
 			case main_state is
 				when wait4startbits=>
@@ -86,6 +88,7 @@ begin
 						successful<='0';
 						tmp:=(others=>'0');
 						index:=0;
+						broadcast<='1';
 					end if;
 				when startbits=>
 					if counter<8 then
@@ -97,6 +100,7 @@ begin
 							main_state:=wait4byte;
 						else
 							main_state:=wait4startbits;
+							broadcast<='0';
 							err:=startbits;
 						end if;
 					end if;
@@ -127,6 +131,7 @@ begin
 					else
 						err:=wait4endbits;
 						main_state:=wait4startbits;
+						broadcast<='0';
 					end if;
 				when endbits=>
 					if counter<8 then
@@ -140,6 +145,7 @@ begin
 							err:=endbits;
 						end if;
 						main_state:=wait4startbits;
+						broadcast<='0';
 					end if;
 				when fixing=>
 					if err=reading then
@@ -150,6 +156,7 @@ begin
 							assign(tmp);
 						else
 							main_state:=wait4startbits;
+							broadcast<='0';
 						end if;
 					elsif err=wait4byte then
 						--mirror to `wait4byte` state
@@ -158,6 +165,7 @@ begin
 						else
 							err:=wait4byte;
 							main_state:=wait4startbits;
+							broadcast<='0';
 						end if;
 					end if;
 			end case;
