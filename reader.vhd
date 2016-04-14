@@ -90,7 +90,6 @@ begin
 						successful<='0';
 						tmp:=(others=>'0');
 						index:=0;
-						broadcast<='1';
 					end if;
 				when startbits=>
 					if counter<8 then
@@ -100,6 +99,7 @@ begin
 						counter:=0;
 						if tmp=x"0a" and data='1' then--data='1' is stop-bit
 							main_state:=wait4byte;
+							broadcast<='1';
 						else
 							main_state:=wait4startbits;
 							broadcast<='0';
