@@ -2,9 +2,14 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
+use work.SIM.all;
 
 entity RFID_reader is
 	port	(
+		--simulation:
+		SIM_PLL_clk	:in std_logic;
+		SIM_vars	:out SIM_vars_type;
+		--design
 		reset		:in std_logic;
 		clk50mhz	:in std_logic;
 		not_data	:in std_logic;
@@ -15,6 +20,13 @@ entity RFID_reader is
 end entity;
 
 architecture arc of RFID_reader is
+	--component PLL50mhz_2400hz
+	--	port(
+	--		areset	:in std_logic:='0';
+	--		inclk0	:in std_logic:='0';
+	--		c0		:out std_logic
+	--	);
+	--end component;
 	component data_buffer
 		port(
 			clk384000hz	:in std_logic;
@@ -28,12 +40,12 @@ architecture arc of RFID_reader is
 	signal clk2400hz:std_logic;
 begin
 	data<=not not_data;
-	PLL50mhz_2400hz_inst:PLL50mhz_2400hz
-		port map(
-			inclk0=>clk50mhz,
-			areset=>not reset,
-			c0=>clk2400hz
-		);
+	--PLL50mhz_2400hz_inst:PLL50mhz_2400hz
+	--	port map(
+	--		inclk0=>clk50mhz,
+	--		areset=>not reset,
+	--		c0=>clk2400hz
+	--	);
 	process(clk2400hz,reset)
 		function valid(chr:std_logic_vector(9 downto 0)) return boolean is
 		begin
@@ -57,7 +69,6 @@ begin
 		end function;
 		variable tmp:std_logic_vector(7 downto 0);
 		variable counter:integer range 0 to 100;
-		type main_state_type is (wait4startbits,startbits,wait4byte,reading,wait4endbits,endbits,fixing);
 		variable main_state:main_state_type;
 		variable sample:integer range 0 to 3;
 		variable index:integer range 0 to 9;
@@ -76,6 +87,12 @@ begin
 			end if;
 		end procedure assign;
 	begin
+		SIM_vars.tmp<=tmp;
+		SIM_vars.counter<=counter;
+		SIM_vars.main_state<=main_state;
+		SIM_vars.sample<=sample;
+		SIM_vars.index<=index;
+		SIM_vars.err<=err;
 		if reset='0' then
 			main_state:=wait4startbits;
 			counter:=0;
