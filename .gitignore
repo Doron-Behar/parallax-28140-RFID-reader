@@ -14,3 +14,5 @@ greybox_tmp/
 simulation/
 *.stp
 
+work/
+transcript
