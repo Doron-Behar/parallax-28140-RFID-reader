@@ -32,7 +32,7 @@ begin
 		elsif rising_edge(clk) then
 			if d.current/=d.last then
 				counter<=(others=>'0');
-			else
+			elsif counter<80 then
 				counter<=counter+1;
 			end if;
 			d.last<=d.current;
