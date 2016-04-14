@@ -15,11 +15,13 @@ entity RFID_reader is
 end entity;
 
 architecture arc of RFID_reader is
-	component PLL50mhz_2400hz
+	component data_buffer
 		port(
-			areset	:in std_logic:='0';
-			inclk0	:in std_logic:='0';
-			c0		:out std_logic
+			clk384000hz	:in std_logic;
+			reset		:in std_logic;
+			not_data	:in std_logic;
+			data		:out std_logic;
+			samples		:out std_logic_vector(15 downto 0)
 		);
 	end component;
 	signal data		:std_logic;
