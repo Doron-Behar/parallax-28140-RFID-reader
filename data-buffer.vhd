@@ -17,12 +17,16 @@ entity data_buffer is
 end entity;
 
 architecture arc of data_buffer is
-	signal counter:integer range 0 to 2**extra_samples_width-1;
 	type d_type is record
 		current:std_logic;
 		last:std_logic;
 	end record;
 	signal d:d_type;
+	type counter_type is record
+		current:integer range 0 to 2**extra_samples_width-1;
+		last:integer range 0 to 2**extra_samples_width-1;
+	end record;
+	signal counter:integer range 0 to 2**extra_samples_width-1;
 begin
 	process(clk,reset)
 	begin
@@ -31,8 +35,10 @@ begin
 			counter<=0;
 		elsif rising_edge(clk) then
 			if d.current/=d.last then
-				counter<=0;
-			elsif counter<80 then
+				if counter mod 16 > 13 then	-- only recieved data
+					counter<=0;				-- continued for more
+				end if;						-- then 13 clocks.
+			elsif counter<79 then
 				counter<=counter+1;
 			end if;
 			d.last<=d.current;

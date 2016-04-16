@@ -1,11 +1,11 @@
-vcom -2008 data-buffer.vhd testbench.vhd
+vcom -2008 data-buffer.vhd data-buffer.TB.vhd
 vsim -voptargs=+acc testbench
 onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -format Logic /testbench/reset
 add wave -noupdate -format Logic /testbench/data_clk
-add wave -noupdate -format Literal /testbench/line__76/counter
-add wave -noupdate -format Logic /testbench/not_data
+add wave -noupdate -format Logic /testbench/real_not_data
+add wave -noupdate -format Logic /testbench/recieved_not_data
 add wave -noupdate -format Logic /testbench/PLL_clk
 add wave -noupdate -format Logic /testbench/data
 add wave -noupdate -format literal -radix unsigned /testbench/samples
