@@ -12,12 +12,12 @@ entity data_buffer is
 		reset	:in std_logic;
 		not_data:in std_logic;
 		data	:out std_logic;
-		samples	:out std_logic_vector(extra_samples_width-1 downto 0)
+		samples	:out integer range 0 to 2**extra_samples_width-1
 	);
 end entity;
 
 architecture arc of data_buffer is
-	signal counter:std_logic_vector(extra_samples_width-1 downto 0);
+	signal counter:integer range 0 to 2**extra_samples_width-1;
 	type d_type is record
 		current:std_logic;
 		last:std_logic;
@@ -28,10 +28,10 @@ begin
 	begin
 		d.current<=not not_data;
 		if reset='0' then
-			counter<=(others=>'0');
+			counter<=0;
 		elsif rising_edge(clk) then
 			if d.current/=d.last then
-				counter<=(others=>'0');
+				counter<=0;
 			elsif counter<80 then
 				counter<=counter+1;
 			end if;

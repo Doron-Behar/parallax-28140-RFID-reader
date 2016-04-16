@@ -1,7 +1,7 @@
 library IEEE;
-use IEEE.std_logic_1164.all  ; 
-use IEEE.std_logic_arith.all  ; 
-use IEEE.std_logic_unsigned.all  ; 
+use IEEE.std_logic_1164.all;
+use IEEE.std_logic_arith.all;
+use IEEE.std_logic_unsigned.all;
 entity testbench is
 end entity;
 
@@ -41,7 +41,7 @@ architecture arc of testbench is
 		-- If 5*16=80 then we need ciel(log2(80))=7 bits for `samples`
 		-- that's the minimal number of bits to represent the number 80.
 	constant extra_samples_width:integer:=7;
-	signal samples:std_logic_vector(extra_samples_width-1 downto 0);
+	signal samples:integer range 0 to 2**extra_samples_width-1;
 	signal clk50mhz:std_logic:='0';
 	signal PLL_clk:std_logic:='0';
 	signal data_clk:std_logic:='0';
@@ -54,7 +54,7 @@ architecture arc of testbench is
 			reset	:in std_logic;
 			not_data:in std_logic;
 			data	:out std_logic;
-			samples	:out std_logic_vector(extra_samples_width-1 downto 0)
+			samples	:out integer range 0 to 2**extra_samples_width-1
 		);
 	end component;
 begin

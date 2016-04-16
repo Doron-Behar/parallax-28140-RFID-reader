@@ -28,25 +28,38 @@ architecture arc of RFID_reader is
 	--	);
 	--end component;
 	component data_buffer
+		generic(
+			extra_samples_width:integer:=4
+		);
 		port(
-			clk384000hz	:in std_logic;
-			reset		:in std_logic;
-			not_data	:in std_logic;
-			data		:out std_logic;
-			samples		:out std_logic_vector(15 downto 0)
+			clk		:in std_logic;
+			reset	:in std_logic;
+			not_data:in std_logic;
+			data	:out std_logic;
+			samples	:out integer range 0 to 2**extra_samples_width-1
 		);
 	end component;
-	signal data		:std_logic;
-	signal clk2400hz:std_logic;
+	signal data:std_logic;
+	signal sampling_clk:std_logic;
 begin
-	data<=not not_data;
 	--PLL50mhz_2400hz_inst:PLL50mhz_2400hz
 	--	port map(
 	--		inclk0=>clk50mhz,
 	--		areset=>not reset,
-	--		c0=>clk2400hz
+	--		c0=>sampling_clk
 	--	);
-	process(clk2400hz,reset)
+	data_buffer_inst:data_buffer
+		generic map(
+			extra_samples_width=>extra_samples_width
+		)
+		port map(
+			clk		=>sampling_clk,
+			reset	=>reset,
+			not_data=>not_data,
+			data	=>data,
+			samples	=>samples
+		);
+	process(sampling_clk,reset)
 		function valid(chr:std_logic_vector(9 downto 0)) return boolean is
 		begin
 			if chr(9)='1' and ((chr(8 downto 1)>=x"30" and chr(8 downto 1)<=x"39") or (chr(8 downto 1)>=x"41" and chr(8 downto 1)<=x"46")) and chr(0)='0' then
@@ -101,7 +114,7 @@ begin
 			successful<='0';
 			index:=0;
 			broadcast<='0';
-		elsif rising_edge(clk2400hz) then
+		elsif rising_edge(sampling_clk) then
 			case main_state is
 				when wait4startbits=>
 					if data='0' then--start-bit
@@ -192,4 +205,5 @@ begin
 			end case;
 		end if;
 	end process;
+	data<=d.current;
 end arc;
