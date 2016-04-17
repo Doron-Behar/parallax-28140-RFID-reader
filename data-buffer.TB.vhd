@@ -44,8 +44,8 @@ architecture arc of testbench is
 		-- If 5*16=80 then we need ciel(log2(80))=7 bits for `samples`
 		-- that's the minimal number of bits to represent the number 80.
 	constant extra_samples_width:integer:=7;
-	signal samples:integer range 0 to 2**extra_samples_width-1;
-	signal clk50mhz:std_logic:='0';
+	subtype samples_type is integer range 0 to 2**extra_samples_width-1;
+	signal samples:samples_type;
 	signal PLL_clk:std_logic:='0';
 	signal data_clk:std_logic:='0';
 	component data_buffer
@@ -61,7 +61,6 @@ architecture arc of testbench is
 		);
 	end component;
 begin
-	clk50mhz<=not clk50mhz after 10 ns;--10[ns]=(1/100mhz)/2,t(50mhz)=20ns
 	reset<='0','1' after 1 us;
 	PLL_clk<=not PLL_clk after 10 us;
 	data_clk<=not data_clk after 160 us;

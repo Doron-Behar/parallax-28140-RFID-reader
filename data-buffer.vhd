@@ -17,16 +17,17 @@ entity data_buffer is
 end entity;
 
 architecture arc of data_buffer is
+	subtype samples_type is integer range 0 to 2**extra_samples_width-1;
 	type d_type is record
 		current:std_logic;
 		last:std_logic;
 	end record;
 	signal d:d_type;
 	type counter_type is record
-		current:integer range 0 to 2**extra_samples_width-1;
-		last:integer range 0 to 2**extra_samples_width-1;
+		current:samples_type;
+		last:samples_type;
 	end record;
-	signal counter:integer range 0 to 2**extra_samples_width-1;
+	signal counter:samples_type;
 begin
 	process(clk,reset)
 	begin
