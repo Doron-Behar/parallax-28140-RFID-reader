@@ -2,14 +2,9 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
---use work.SIM.all;
 
 entity RFID_reader is
 	port	(
-		----simulation:
-		--SIM_PLL_clk	:in std_logic;
-		--SIM_vars	:out SIM_vars_type;
-		----design
 		reset		:in std_logic;
 		clk50mhz	:in std_logic;
 		not_data	:in std_logic;
@@ -104,12 +99,6 @@ begin
 			end if;
 		end procedure assign;
 	begin
-		--SIM_vars.tmp<=tmp;
-		--SIM_vars.counter<=counter;
-		--SIM_vars.main_state<=main_state;
-		--SIM_vars.sample<=sample;
-		--SIM_vars.index<=index;
-		--SIM_vars.err<=err;
 		if reset='0' then
 			main_state:=wait4startbits;
 			counter:=0;
