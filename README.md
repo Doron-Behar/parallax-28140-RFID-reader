@@ -1,3 +1,4 @@
+<!--Ment for Github - No mathjax-->
 #**Driver for RFID-reader by Parallax**
 
 ####Ment for [RFID-reader by Parallax - Product#28140][1] written in VHDL for Altera FPGA devices.
@@ -19,20 +20,19 @@ GND pins
 
 The GPIO I/O pins can't recieve higher voltage than 3.3[V], therefor **you must convert S<sub>out</sub>'s voltage range from 5[V] - 0[V] to 3.3[V] - 0[V]** with an external electrical circuit.
 Quote from the manual for `DE2-115`:
-> The voltage level of the I/O pins on the expansion headers can be adjusted to 3.3V, 2.5V, 1.8V, or
-1.5V using JP6 (The default value is 3.3V[..])
+> The voltage level of the I/O pins on the expansion headers can be adjusted to 3.3V, 2.5V, 1.8V, or 1.5V using JP6 (The default value is 3.3V[..])
 
 I designed and implemented the following design:<sup>1</sup>
 ![circuit](https://raw.githubusercontent.com/Doron-Behar/parallax-28140-RFID-reader/master/images/circuit.png)
 ####This is how the circuit work for every state of S <sub>out</sub>:
-|S<sub>out</sub> = 5[V]             |S<sub>out</sub> = 0[V]
-|-----------------------------------|------------------
-|V<sub>BB</sub> > V<sub>CC<sub>     |V<sub>BB</sub> = 0[V] = I<sub></sub>B * R<sub>1</sub> + V<sub>BE</sub> + 0
-|Transistor is on it's sub-threshold|I<sub>BB</sub> ≈ 0[V]
-|V<sub>R2</sub> = 3.3[V]            |Transistor is saturated
-|S<sub>in</sub> = 0[V]              |I<sub>C</sub> ≥ β * I<sub>B</sub>
-|                                   |I<sub>C</sub> = (3.3[v] - S<sub>in</sub>) / R<sub>2</sub>
-|                                   |S<sub>in</sub> = 3.3[V]
+|S<sub>out</sub> = 5[V]                                                                      |S<sub>out</sub> = 0[V]
+|--------------------------------------------------------------------------------------------|------------------
+|V<sub>BE</sub> = 0.7[V]                                                                     |V<sub>BB</sub> = 0[V] = I<sub>B</sub>R<sub>1</sub> + V<sub>BE</sub>
+|V<sub>R1</sub> = S<sub>out</sub> = 5[V] = I<sub>B</sub>R<sub>1</sub>                        |I<sub>B</sub> ≈ 0 [V]
+|3.3 [V] = I<sub>C</sub>R<sub>2</sub> + V<sub>CE</sub>                                       |Transistor is on it's sub-threshold
+|Because both resistors are equal => I<sub>C</sub> ≥ βI<sub>B</sub>                          |I<sub>R2</sub> = 0
+|Transistor is satuarated                                                                    |S<sub>in</sub> = V<sub>BB</sub> = 3.3[V]
+|S<sub>IN</sub> = V<sub>B</sub> = 3.3 [V]                                                    |
 
 As you can see, there is an invertion for the signal coming out of the reader. Therefor there is a not statement in the design As well as in the pin-assignments.
 ###Communication Protocol

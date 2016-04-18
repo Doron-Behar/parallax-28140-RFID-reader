@@ -12,7 +12,7 @@ entity RFID_reader is
 		----design
 		reset		:in std_logic;
 		clk50mhz	:in std_logic;
-		not_data	:in std_logic;
+		data		:in std_logic;
 		ID			:out std_logic_vector(40-1 downto 0);
 		successful	:out std_logic;
 		broadcast	:out std_logic
@@ -27,22 +27,6 @@ architecture arc of RFID_reader is
 			c0		:out std_logic
 		);
 	end component;
-	constant extra_samples_width:integer:=7;
-	component data_buffer
-		generic(
-			extra_samples_width:integer:=4
-		);
-		port(
-			clk		:in std_logic;
-			reset	:in std_logic;
-			not_data:in std_logic;
-			data	:out std_logic;
-			samples	:out integer range 0 to 2**extra_samples_width-1
-		);
-	end component;
-	subtype samples_type is integer range 0 to 2**extra_samples_width-1;
-	signal samples:samples_type;
-	signal data:std_logic;
 	signal sampling_clk:std_logic;
 begin
 	PLL_inst:PLL
@@ -50,17 +34,6 @@ begin
 			inclk0=>clk50mhz,
 			areset=>not reset,
 			c0=>sampling_clk
-		);
-	data_buffer_inst:data_buffer
-		generic map(
-			extra_samples_width=>extra_samples_width
-		)
-		port map(
-			clk		=>sampling_clk,
-			reset	=>reset,
-			not_data=>not_data,
-			data	=>data,
-			samples	=>samples
 		);
 	process(sampling_clk,reset)
 		function valid(chr:std_logic_vector(9 downto 0)) return boolean is
@@ -118,7 +91,7 @@ begin
 			successful<='0';
 			index:=0;
 			broadcast<='0';
-		elsif rising_edge(sampling_clk) and samples mod 16 > 13 then
+		elsif rising_edge(sampling_clk) then
 			case main_state is
 				when wait4startbits=>
 					if data='0' then--start-bit
