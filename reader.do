@@ -1,23 +1,14 @@
 vcom -2008 SIM.package.vhd reader.vhd reader.TB.vhd
 vsim -voptargs=+acc testbench
-onerror {resume}
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -format Logic /testbench/reset
+add wave -noupdate -format Logic /testbench/data_clk
 add wave -noupdate -format Logic /testbench/data
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.sample.clk
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.sample.counter
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.last.state
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.last.counter
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.last.bits
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.last.nbits
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.last.enable
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.current.state
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.current.counter
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.current.bits
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.current.nbits
-add wave -noupdate -format Logic /testbench/SIM_vars.UART.rxs.current.enable
-add wave -noupdate -format Logic /testbench/ID
+add wave -noupdate -format Literal -radix hexadecimal /testbench/byte
+add wave -noupdate -format Logic /testbench/uart_tx
+add wave -noupdate -format Logic /testbench/pmod
 TreeUpdate [SetDefaultTree]
+WaveRestoreCursors {{Cursor 1} {16241234 ns} 0}
 configure wave -namecolwidth 150
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
