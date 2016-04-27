@@ -17,3 +17,5 @@ simulation/
 work/
 transcript
 vsim.wlf
+wlf*
+*.vstf
