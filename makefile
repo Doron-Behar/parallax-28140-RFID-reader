@@ -10,14 +10,14 @@ F="Cyclone IV E"
 f=2400
 all: compile program
 compile:
-	${QUARTUS_BIN}/quartus_sh --flow compile ${P}
+	quartus_sh --flow compile ${P}
 project:
-	${QUARTUS_BIN}/quartus_sh --tcl_eval project_new -f ${F} -overwrite -p ${DEV} ${P}
+	quartus_sh --tcl_eval project_new -f ${F} -overwrite -p ${DEV} ${P}
 program:
-	${QUARTUS_BIN}/quartus_pgm -c USB-Blaster ${P}.cdf
+	quartus_pgm -c USB-Blaster ${P}.cdf
 RTL:
-	${QUARTUS_BIN}/qnui ${P}
+	qnui ${P}
 symbol:
-	${QUARTUS_BIN}/quartus_map ${P} --generate_symbol=${d}
+	quartus_map ${P} --generate_symbol=${d}
 analysis:
-	${QUARTUS_BIN}/quartus_map ${P}
+	quartus_map ${P}
