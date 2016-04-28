@@ -4,16 +4,16 @@ use IEEE.std_logic_arith.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.math_real.all;
 
-package SIM is
+package lib is
 	--====================================================================
 	--------------------------------UART----------------------------------
 	--====================================================================
 	constant divisor:natural:=2604; -- DIVISOR=100,000,000 / (16 x BAUD_RATE)
-			-- for a frequency of 2400hz you need to put 2604 as a divisor
-			-- for a frequency of 9600hz you need to put 651 as a divisor
-			-- for a frequency of 115200hz you need to put 54 as a divisor
-			-- for a frequency of 1562500hz you need to put 4 as a divisor
-			-- for a frequency of 2083333hz you need to put 3 as a divisor
+		-- for a frequency of 2400hz you need to put 2604 as a divisor
+		-- for a frequency of 9600hz you need to put 651 as a divisor
+		-- for a frequency of 115200hz you need to put 54 as a divisor
+		-- for a frequency of 1562500hz you need to put 4 as a divisor
+		-- for a frequency of 2083333hz you need to put 3 as a divisor
 	type UART_fsm_state_type is (idle,active); -- common to both RX and TX FSM
 	type UART_rxs_state_type is record
 		-- FSM state:
@@ -97,6 +97,14 @@ package SIM is
 		UART:UART_type;
 		reciever:reciever_type;
 	end record;
+	component PLL is
+		PORT(
+			areset	:in std_logic:='0';
+			inclk0	:in std_logic:='0';
+			c0		:out std_logic;
+			c1		:out std_logic
+		);
+	end component;
 	component RFID_reader is
 		port(
 			----simulation:
@@ -113,6 +121,6 @@ package SIM is
 			pmod		:out std_logic_vector(1 downto 0)
 		);
 	end component;
-end package SIM;
+end package;
 
 

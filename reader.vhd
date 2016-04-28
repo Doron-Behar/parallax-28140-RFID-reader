@@ -2,7 +2,7 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
-use work.SIM.all;
+use work.lib.all;
 
 entity RFID_reader is
 	port(
@@ -10,7 +10,7 @@ entity RFID_reader is
 		SIM_vars	:out SIM_vars_type;
 		----design
 		reset		:in std_logic;
-		clk100mhz	:in std_logic;
+		clk50mhz	:in std_logic;
 		data		:in std_logic;
 		ID			:out std_logic_vector(40-1 downto 0);
 		successful	:out std_logic;
@@ -44,7 +44,19 @@ architecture arc of RFID_reader is
 	end function;
 	signal UART:UART_type;
 	signal reciever:reciever_type;
+	signal clk100mhz:std_logic;
 begin
+	--====================================================================
+	---------------------------------PLL----------------------------------
+	--====================================================================
+	PLL_inst:PLL
+		port map(
+			areset	=>not reset,
+			inclk0	=>clk50mhz,
+			c0		=>clk100mhz,
+			-- a 9.6khz sample clock that might later be used for signaltap
+			c1		=>open
+		);
 	--====================================================================
 	--------------------------------UART----------------------------------
 	--====================================================================

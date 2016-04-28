@@ -1,7 +1,7 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
-use work.SIM.all;
+use work.lib.all;
 
 entity testbench is
 end entity;
