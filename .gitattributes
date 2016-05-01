@@ -1,1 +1,2 @@
-*.qsf filter=qsf
+reader.vhd filter=data-not-data
+RFID-reader.qsf filter=qsf-data-not-data
