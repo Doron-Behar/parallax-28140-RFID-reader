@@ -22,9 +22,9 @@ entity RFID_reader is
 end entity;
 
 architecture arc of RFID_reader is
-	function valid(chr:std_logic_vector(9 downto 0)) return boolean is
+	function valid(chr:std_logic_vector(7 downto 0)) return boolean is
 	begin
-		if chr(9)='1' and ((chr(8 downto 1)>=x"30" and chr(8 downto 1)<=x"39") or (chr(8 downto 1)>=x"41" and chr(8 downto 1)<=x"46")) and chr(0)='0' then
+		if (chr(7 downto 0)>=x"30" and chr(7 downto 0)<=x"39") or (chr(7 downto 0)>=x"40" and chr(7 downto 0)<=x"46") then
 			return true;
 		else
 			return false;
@@ -187,7 +187,7 @@ begin
 		UART.tx.buff<=UART.txs.last.bits(0);
 	end process;
 	--====================================================================
-	------------------------------reciever--------------------------------
+	------------------------------receiver--------------------------------
 	--====================================================================
 	pmod(0)<=UART.tx.enable;
 	pmod(1)<=UART.tx.ready;
@@ -228,5 +228,58 @@ begin
 		UART.tx.enable<=reciever.last.tx.enable;
 		UART.tx.data<=reciever.last.tx.data;
 		byte<=reciever.last.tx.data;
+	end process;
+	--====================================================================
+	-------------------------------reader---------------------------------
+	--====================================================================
+	process(clk100mhz,reset)
+		type byte_type is record
+			current:std_logic_vector(7 downto 0);
+			last:std_logic_vector(7 downto 0);
+			index:integer range 0 to 9;
+		end record;
+		variable byte:byte_type;
+		type state_type is (startbyte,databytes,endbyte);
+		variable state:state_type;
+	begin
+		byte.current:=reciever.last.tx.data;
+		if reset='0' then
+			byte.index:=0;
+			byte.last:=x"00";
+			byte.current:=x"00";
+		elsif rising_edge(clk100mhz) then
+			if byte.current/=byte.last then
+				case state is
+					when startbyte=>
+						if byte.last=x"0A" then
+						--start byte:
+							state:=databytes;
+							byte.index:=1;
+							--report that a broadcast has started:
+							broadcast<='1';
+							--make `successful` low to imply that we don't
+							--know if the rest of the following broadcast
+							--will be successful.
+							successful<='0';
+						end if;
+					when databytes=>
+						if byte.index<9 and valid(byte.last)=true then
+							ID(byte.index*4+3 downto byte.index*4)<=ascii2hex(byte.last);
+						else
+							state:=endbyte;
+						end if;
+						byte.index:=byte.index+1;
+					when endbyte=>
+						if byte.last=x"0D" then
+							--report a successful transmission finished:
+							successful<='1';
+							--report that a broadcast has finished:
+							broadcast<='0';
+							state:=startbyte;
+						end if;
+				end case;
+			end if;
+			byte.last:=byte.current;
+		end if;
 	end process;
 end arc;
