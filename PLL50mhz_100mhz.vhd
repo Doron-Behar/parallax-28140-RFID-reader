@@ -4,7 +4,7 @@
 -- MODULE: altpll 
 
 -- ============================================================
--- File Name: PLL.vhd
+-- File Name: PLL50mhz_100mhz.vhd
 -- Megafunction Name(s):
 -- 			altpll
 --
@@ -40,7 +40,7 @@ USE ieee.std_logic_1164.all;
 LIBRARY altera_mf;
 USE altera_mf.all;
 
-ENTITY PLL IS
+ENTITY PLL50mhz_100mhz IS
 	PORT
 	(
 		areset		: IN STD_LOGIC  := '0';
@@ -48,10 +48,10 @@ ENTITY PLL IS
 		c0		: OUT STD_LOGIC ;
 		c1		: OUT STD_LOGIC 
 	);
-END PLL;
+END PLL50mhz_100mhz;
 
 
-ARCHITECTURE SYN OF pll IS
+ARCHITECTURE SYN OF PLL50mhz_100mhz IS
 
 	SIGNAL sub_wire0	: STD_LOGIC_VECTOR (4 DOWNTO 0);
 	SIGNAL sub_wire1	: STD_LOGIC ;
@@ -155,7 +155,7 @@ BEGIN
 		compensate_clock => "CLK0",
 		inclk0_input_frequency => 20000,
 		intended_device_family => "Cyclone IV E",
-		lpm_hint => "CBX_MODULE_PREFIX=PLL",
+		lpm_hint => "CBX_MODULE_PREFIX=PLL50mhz_100mhz",
 		lpm_type => "altpll",
 		operation_mode => "NORMAL",
 		pll_type => "AUTO",
@@ -287,7 +287,7 @@ END SYN;
 -- Retrieval info: PRIVATE: PLL_PFDENA_CHECK STRING "0"
 -- Retrieval info: PRIVATE: PLL_TARGET_HARCOPY_CHECK NUMERIC "0"
 -- Retrieval info: PRIVATE: PRIMARY_CLK_COMBO STRING "inclk0"
--- Retrieval info: PRIVATE: RECONFIG_FILE STRING "PLL.mif"
+-- Retrieval info: PRIVATE: RECONFIG_FILE STRING "PLL50mhz_100mhz.mif"
 -- Retrieval info: PRIVATE: SACN_INPUTS_CHECK STRING "0"
 -- Retrieval info: PRIVATE: SCAN_FEATURE_ENABLED STRING "1"
 -- Retrieval info: PRIVATE: SELF_RESET_LOCK_LOSS STRING "0"
@@ -378,11 +378,11 @@ END SYN;
 -- Retrieval info: CONNECT: @inclk 0 0 1 0 inclk0 0 0 0 0
 -- Retrieval info: CONNECT: c0 0 0 0 0 @clk 0 0 1 0
 -- Retrieval info: CONNECT: c1 0 0 0 0 @clk 0 0 1 1
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL.vhd TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL.ppf TRUE
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL.inc FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL.cmp FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL.bsf FALSE
--- Retrieval info: GEN_FILE: TYPE_NORMAL PLL_inst.vhd FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz.vhd TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz.ppf TRUE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz.inc FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz.cmp FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz.bsf FALSE
+-- Retrieval info: GEN_FILE: TYPE_NORMAL PLL50mhz_100mhz_inst.vhd FALSE
 -- Retrieval info: LIB_FILE: altera_mf
 -- Retrieval info: CBX_MODULE_PREFIX: ON

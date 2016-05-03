@@ -1,7 +1,4 @@
 RFID-reader*
-*.qip
-*.ppf
-*.swo
 .qsys*
 *.txt
 *.bsf
