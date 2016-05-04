@@ -2,7 +2,10 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.std_logic_arith.all;
-use work.lib.all;
+library RFID;
+use RFID.UART.all;
+use RFID.reciever.all;
+use RFID.components.all;
 
 entity RFID_reader is
 	port(

@@ -1,13 +1,11 @@
+-- synthesis library RFID
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_arith.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.math_real.all;
 
-package lib is
-	--====================================================================
-	--------------------------------UART----------------------------------
-	--====================================================================
+package UART is
 	constant divisor:natural:=2604; -- DIVISOR=100,000,000 / (16 x BAUD_RATE)
 		-- for a frequency of 2400hz you need to put 2604 as a divisor
 		-- for a frequency of 9600hz you need to put 651 as a divisor
@@ -77,50 +75,4 @@ package lib is
 		tx:UART_tx_type;
 		sample:UART_sample_type;
 	end record;
-	--====================================================================
-	------------------------------reciever--------------------------------
-	--====================================================================
-	type reciever_fsm_state_type is (idle,received,emitting);
-	type reciever_tx_type is record
-		data:std_logic_vector(7 downto 0);
-		enable:std_logic;
-	end record;
-	type reciever_state_type is record
-		state:reciever_fsm_state_type;
-		tx:reciever_tx_type;
-	end record;
-	type reciever_type is record
-		current:reciever_state_type;
-		last:reciever_state_type;
-	end record;
-	type SIM_vars_type is record
-		UART:UART_type;
-		reciever:reciever_type;
-	end record;
-	component PLL is
-		PORT(
-			areset	:in std_logic:='0';
-			inclk0	:in std_logic:='0';
-			c0		:out std_logic;
-			c1		:out std_logic
-		);
-	end component;
-	component RFID_reader is
-		port(
-			----simulation:
-			SIM_vars	:out SIM_vars_type;
-			----design
-			reset		:in std_logic;
-			clk100mhz	:in std_logic;
-			data		:in std_logic;
-			ID			:out std_logic_vector(40-1 downto 0);
-			successful	:out std_logic;
-			broadcast	:out std_logic;
-			byte		:out std_logic_vector(7 downto 0);
-			uart_tx		:out std_logic;
-			pmod		:out std_logic_vector(1 downto 0)
-		);
-	end component;
 end package;
-
-
