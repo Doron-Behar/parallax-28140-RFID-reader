@@ -6,18 +6,18 @@ TLE=RFID_reader
 DEV=EP4CE115F29C7
 # family of the device
 F="Cyclone IV E"
-# frequency for pll:
-f=2400
+# custom FLAGS - mainly for setting the 64 bit flag or not:
+FLAGS=--64bit
 all: compile program
 compile:
-	quartus_sh --flow compile ${P}
+	quartus_sh ${FLAGS} --flow compile ${P}
 project:
-	quartus_sh --tcl_eval project_new -f ${F} -overwrite -p ${DEV} ${P}
+	quartus_sh ${FLAGS} --tcl_eval project_new -f ${F} -overwrite -p ${DEV} ${P}
 program:
-	quartus_pgm -c USB-Blaster ${P}.cdf
+	quartus_pgm ${FLAGS} -c USB-Blaster ${P}.cdf
 RTL:
-	qnui ${P}
+	qnui ${FLAGS} ${P}
 symbol:
-	quartus_map ${P} --generate_symbol=${d}
+	quartus_map ${FLAGS} ${P} --generate_symbol=${d}
 analysis:
-	quartus_map ${P}
+	quartus_map ${FLAGS} ${P}
