@@ -1,1 +1,2 @@
 reader.vhd filter=data-not-data
+lib/components.vhd filter=data-not-data

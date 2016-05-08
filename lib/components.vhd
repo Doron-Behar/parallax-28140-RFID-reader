@@ -19,7 +19,7 @@ package components is
 			----design
 			reset		:in std_logic;
 			clk100mhz	:in std_logic;
-			not_data	:in std_logic;
+			data		:in std_logic;
 			ID			:out std_logic_vector(40-1 downto 0);
 			successful	:out std_logic;
 			broadcast	:out std_logic;

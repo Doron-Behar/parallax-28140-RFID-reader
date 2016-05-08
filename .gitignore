@@ -1,4 +1,5 @@
 RFID-reader*
+*.bak
 .qsys*
 *.txt
 *.bsf
