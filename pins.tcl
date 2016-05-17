@@ -1,6 +1,3 @@
-set_location_assignment PIN_M23 -to reset
-set_location_assignment PIN_Y2 -to clk50mhz
-set_location_assignment PIN_AC19 -to data
 set_location_assignment PIN_H22 -to ID[6]
 set_location_assignment PIN_J22 -to ID[5]
 set_location_assignment PIN_L25 -to ID[4]

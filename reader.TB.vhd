@@ -43,7 +43,7 @@ begin
 	process(data_clk,reset)
 		variable counter:integer;
 	begin
-		if reset='0' then
+		if reset='1' then
 			counter:=0;
 			data<='0';
 		elsif rising_edge(data_clk) then

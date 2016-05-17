@@ -57,7 +57,7 @@ begin
 	-- sample signal at 16x baud rate, 1 clk spikes:
 	sample_process:process(clk100mhz,reset) is
 	begin
-		if reset='0' then
+		if reset='1' then
 			UART.sample.counter<=(others=>'0');
 			UART.sample.clk<='0';
 		elsif rising_edge(clk100mhz) then
@@ -73,7 +73,7 @@ begin
 	-- RX, TX state registers update at each clk, and reset
 	reg_process:process(clk100mhz,reset) is
 	begin
-		if reset='0' then
+		if reset='1' then
 			UART.rxs.last.state<=idle;
 			UART.rxs.last.bits<=(others=>'0');
 			UART.rxs.last.nbits<=(others=>'0');
@@ -184,7 +184,7 @@ begin
 	pmod(1)<=UART.tx.ready;
 	fsm_clk:process(clk100mhz,reset) is
 	begin
-		if reset='0' then
+		if reset='1' then
 			reciever.last.state<=idle;
 			reciever.last.tx.data<=(others=>'0');
 			reciever.last.tx.enable<='0';
@@ -234,7 +234,7 @@ begin
 		variable state:state_type;
 	begin
 		byte.current:=reciever.last.tx.data;
-		if reset='0' then
+		if reset='1' then
 			byte.index:=0;
 			byte.last:=x"00";
 			byte.current:=x"00";
