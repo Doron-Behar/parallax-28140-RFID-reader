@@ -21,3 +21,5 @@ symbol:
 	quartus_map ${FLAGS} ${P} --generate_symbol=${d}
 analysis:
 	quartus_map ${FLAGS} ${P}
+gui:
+	quartus gui ${P}.qpf || quartus ${FLAGS} ${P}.qpf || ${QUARTUS_BIN}/quartus ${FLAGS} ${P}.qpf
