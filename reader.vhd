@@ -9,9 +9,9 @@ use RFID.components.all;
 
 entity RFID_reader is
 	port(
-		----simulation:
+		-- simulation:
 		SIM_vars	:out SIM_vars_type;
-		----design
+		-- design
 		reset		:in std_logic;
 		clk100mhz	:in std_logic;
 		data		:in std_logic;

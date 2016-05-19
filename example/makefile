@@ -1,7 +1,7 @@
 # project-name
 P=RFID-reader
 # top-level-entity
-TLE=RFID_reader
+TLE=example
 # device selected for programming
 DEV=EP4CE115F29C7
 # family of the device
