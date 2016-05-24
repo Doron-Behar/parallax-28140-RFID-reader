@@ -1,4 +1,8 @@
-vcom -2008 SIM.package.vhd reader.vhd reader.TB.vhd
+vlib RFID
+vmap RFID ../lib/UART.vhd
+vmap RFID ../lib/receiver.vhd
+vmap RFID ../lib/components.vhd
+vcom -2008 -work ../reader.vhd testbench.vhd
 vsim -voptargs=+acc testbench
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -format Logic /testbench/reset
@@ -23,4 +27,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-run 300 ms 
+run 300 ms
